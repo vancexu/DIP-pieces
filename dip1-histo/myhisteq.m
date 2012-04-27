@@ -1,8 +1,7 @@
-% lab1 - image equalization 091250183 xubowei
 function g = myhisteq(f)
-%MYHISTEQ compute the histogram of an input image
-%
-%
+%MYHISTEQ compute the histogram equalization of an input image
+%   input f is the input image
+%   output g is the image that f turns out after equalization.
 
 [d1, d2, d3] = size(f);
 if d3 > 1

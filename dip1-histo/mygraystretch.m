@@ -1,8 +1,9 @@
-% lab1 - gray scale stretch 091250183 xubowei
 function g = mygraystretch(f, a, b)
-%MYHISTEQ compute the histogram of an input image
-%
-%
+%MYGRAYSTRETCH compute the gray scale stretch of an image
+%   input f,a,b where f is the input image, a b are parameters of the
+%   linear equtation (a*x+b)
+%   output is image g
+
 if nargin ~= 3
     error('Not enough parameters, 3 must be input!');
 end
@@ -16,6 +17,12 @@ for i = 1:d1
     for j = 1:d2
         k = double(f(i,j));
         g(i,j) = a * k + b;
+        if g(i,j) > 255
+            g(i,j) = 255;
+        end
+        if g(i,j) < 0
+            g(i,j) = 0
+        end
     end
 end
 g = uint8(g);

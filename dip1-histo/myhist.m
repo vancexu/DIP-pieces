@@ -1,10 +1,15 @@
-% lab1 - histogram 091250183 xubowei
 function g = myhist(f, varargin)
 %MYHIST compute the histogram of an input image
-%
-%
+%   myhist(f) where f is the input image, default quantum is 256.
+%   myhist(f, n) where f is input image, n is the quantum > 0
+%   out put g is the histogram of the input image.
 
 error(nargchk(1, 2, nargin));
+if nargin == 2
+    if varargin{1} <= 0 | strcmp(class(varargin{1}), 'double')
+        error('the quantum must be positive integer');
+    end
+end
 
 [d1, d2, d3] = size(f);
 if d3 > 1
