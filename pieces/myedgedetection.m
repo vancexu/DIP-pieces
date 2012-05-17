@@ -23,18 +23,12 @@ end
 
 for i = 2:d1-1
     for j = 2:d2-1
-        maxp = double(f(i,j));
-        minp = double(f(i,j));
-        for m = i-1:i+1
-            for n = j-1:j+1
-                if(f(m,n) > maxp)
-                    maxp = f(m,n);
-                end
-                if(f(m,n) < minp)
-                    minp = f(m,n);
-                end
-            end
-        end
+        tmp = [
+            f(i-1,j-1),f(i-1,j),f(i-1,j+1);
+            f(i,j-1),f(i,j),f(i,j+1);
+            f(i+1,j-1),f(i+1,j),f(i+1,j+1)];        
+        maxp = double(max(tmp(:)));
+        minp = double(min(tmp(:)));
         diff = maxp - minp;
         if diff >= threshold
             g(i,j) = 255;
