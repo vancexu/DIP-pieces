@@ -1,15 +1,13 @@
 function g = myedge(f, varargin)
-%MYEDGE
-%   myedge(f, method) where f is input image
-%   myedge(f, method, threshod) where n is threshod
+%MYEDGE Find edges in intensity image.
+%   myedge(f, method) where f is input image, method is one of the 5
+%   methods { 'roberts', 'prewitt', 'sobel', 'marr', 'canny' }
+%   myedge(f, method, threshold) where threshold is used to adjust the result
 %   output is image g
 %
-%   The principle is: for each pixel f(i,j), consider the 8 pixels around
-%   it and then record the max and min pixel grey density. Then compute the
-%   difference of the max and min and assign it to varaible diff. If diff >
-%   threshold, the output g(i,j) = 255, else g(i,j) = 0;
+%   threshold is important, it affect the result directely
+%   default threshold is chosen by experiment with "lena picture"
 
-threshold  = 0.7;
 if nargin < 2
     error('At least 2 arguments are needed');
 elseif nargin > 3
@@ -27,19 +25,25 @@ f = im2double(f);
 g = zeros(d1, d2);
 
 if strcmp(method,'roberts')
+    if nargin == 2
+        threshold = 0.15;
+    end
     for i = 1:d1-1
         for j = 1:d2-1
             g(i,j) = abs(f(i,j)-f(i+1,j+1)) + abs(f(i+1,j)-f(i,j+1));
+            if g(i,j) < threshold
+                g(i,j) = 0;
+            else
+                g(i,j) = 255;
+            end
         end
-    end
-    if g(i,j) > threshold
-        g(i,j) = 0;
-    else
-        g(i,j) = 255;
     end
 end
 
 if strcmp(method,'prewitt')
+    if nargin == 2
+        threshold = 0.55;
+    end
     h1 = [
         -1,0,1;
         -1,0,1;
@@ -56,16 +60,19 @@ if strcmp(method,'prewitt')
             fx = tmp.*h1;
             fy = tmp.*h2;
             g(i,j) = abs(sum(fx(:)))+abs(sum(fy(:)));
+            if g(i,j) < threshold
+                g(i,j) = 0;
+            else
+                g(i,j) = 255;
+            end
         end
-    end
-    if g(i,j) > threshold
-        g(i,j) = 0;
-    else
-        g(i,j) = 255;
     end
 end            
 
 if strcmp(method,'sobel')
+    if nargin == 2
+        threshold = 0.6;
+    end
     h1 = [
         -1,0,1;
         -2,0,2;
@@ -82,16 +89,19 @@ if strcmp(method,'sobel')
             fx = tmp.*h1;
             fy = tmp.*h2;
             g(i,j) = abs(sum(fx(:)))+abs(sum(fy(:)));
+            if g(i,j) < threshold
+                g(i,j) = 0;
+            else
+                g(i,j) = 255;
+            end
         end
-    end
-    if g(i,j) > threshold
-        g(i,j) = 0;
-    else
-        g(i,j) = 255;
-    end
+    end    
 end
 
 if strcmp(method,'marr')
+    if nargin == 2
+        threshold = 0.8;
+    end
     log = [
         0,0,-1,0,0;
         0,-1,-2,-1,0;
@@ -122,6 +132,9 @@ if strcmp(method,'marr')
 end
     
 if strcmp(method,'canny')
+    if nargin == 2
+        threshold = 0.07;
+    end
     gaus = fspecial('gaussian');
     f = imfilter(f,gaus,'replicate');
     h1 = [-1,-1;1,1];
@@ -182,7 +195,35 @@ if strcmp(method,'canny')
             end
         end
     end
-    g = grad;
+    g = im2bw(grad, 0.05);  %0.05 is acceptable for lena
+    t1 = threshold; %0.07 ok
+    t2 = 2 * t1;
+    out1 = g;
+    out2 = g;
+    for i = 1:d1
+        for j = 1:d2
+            if grad(i,j) < t1
+                out1(i,j) = 0;
+            end
+            if grad(i,j) < t2
+                out2(i,j) = 0;
+            end
+        end
+    end
+%     imshow(out1),figure, imshow(out2),figure;
+    for i = 2:d1-1
+        for j = 2:d2-1
+            if out2(i,j) == 0 && out1(i,j) == 1
+                tmp = out1(i-1:i+1,j-1:j+1);
+                tmp(2,2) = 0;
+                if any(tmp)
+                    out2(i,j) = 1;
+                end
+            end
+        end
+    end
+    g = out2;
+%     imshow(out1),figure, imshow(out2);
 end
 
     
